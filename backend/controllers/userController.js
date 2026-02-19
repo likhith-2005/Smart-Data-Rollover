@@ -1,3 +1,4 @@
+const UsageHistory = require("../models/UsageHistory");
 const User = require("../models/User");
 
 
@@ -85,6 +86,12 @@ exports.updateUsage = async (req, res) => {
     }
 
     user.todayUsage = usage;
+    // Save usage history
+await UsageHistory.create({
+  userId,
+  usage,
+  date: new Date()
+});
 
     await user.save();
 
@@ -143,3 +150,13 @@ exports.rechargePlan = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+exports.getHistory = async (req, res) => {
+  try {
+    const history = await UsageHistory.find({ userId: req.params.userId }).sort({ date: -1 });
+    res.status(200).json(history);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+

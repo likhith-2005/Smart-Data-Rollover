@@ -32,7 +32,16 @@ const userSchema = new mongoose.Schema({
   lastResetDate: {
     type: Date,
     default: Date.now
-  }
+  },
+
+  // ✅ FIXED: Added comma above and correct schema below
+  history: [
+    {
+      date: { type: Date, default: Date.now },
+      usage: Number,
+      message: String
+    }
+  ]
 });
 
 module.exports = mongoose.model("User", userSchema);

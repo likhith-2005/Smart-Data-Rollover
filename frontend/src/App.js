@@ -1,5 +1,10 @@
+import AddUser from "./AddUser";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Card, CardContent, Button, TextField, Typography } from "@mui/material";
+import Recharge from "./Recharge";
+import History from "./History";
+
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -43,16 +48,23 @@ function App() {
       .catch((err) => console.log(err));
   };
 
-  // UI
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Smart Data Rollover Dashboard</h1>
+    <div style={{ textAlign: "center", padding: "30px" }}>
+      <Typography variant="h3" sx={{ mb: 3, fontWeight: "bold" }}>
+        Smart Data Rollover Dashboard
+      </Typography>
+
+      {/* Add User Form */}
+      <AddUser />
+
+      <Recharge />
+
+      <hr style={{ margin: "30px 0" }} />
 
       {users.length === 0 ? (
-        <p>No Users Found</p>
+        <Typography>No Users Found</Typography>
       ) : (
         users.map((user) => {
-          // Check Expiry
           const rechargeDate = new Date(user.rechargeStartDate);
           const expiryDate = new Date(rechargeDate);
           expiryDate.setDate(expiryDate.getDate() + user.validity);
@@ -61,76 +73,79 @@ function App() {
           const isExpired = today > expiryDate;
 
           return (
-            <div
+            <Card
               key={user._id}
-              style={{
-                border: "1px solid black",
-                padding: "20px",
-                margin: "20px",
-                borderRadius: "10px",
+              sx={{
+                width: "50%",
+                margin: "20px auto",
+                padding: "10px",
+                boxShadow: 5,
+                borderRadius: "12px",
               }}
             >
-              <h3>{user.name}</h3>
-              <p>Plan: {user.planType}</p>
-              <p>Daily Limit: {user.dailyLimit} MB</p>
+              <CardContent>
+                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                  {user.name}
+                </Typography>
 
-              {/* -------- EXPIRED PLAN UI -------- */}
-              {isExpired ? (
-                <>
-                  <p style={{ color: "red", fontWeight: "bold" }}>
-                    ❌ Plan Expired
-                  </p>
+                <Typography sx={{ mt: 1 }}>Plan: {user.planType}</Typography>
+                <Typography>Daily Limit: {user.dailyLimit} MB</Typography>
 
-                  <button
-                    onClick={() => recharge(user._id)}
-                    style={{
-                      padding: "8px 14px",
-                      backgroundColor: "green",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "5px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    🔄 Recharge Now
-                  </button>
-                </>
-              ) : (
-                <>
-                  {/* -------- ACTIVE PLAN UI -------- */}
-                  <p>Today Usage: {user.todayUsage} MB</p>
-                  <p>Data Bank: {user.dataBank} MB</p>
+                {isExpired ? (
+                  <>
+                    <Typography sx={{ color: "red", fontWeight: "bold", mt: 2 }}>
+                      ❌ Plan Expired
+                    </Typography>
 
-                  <p>
-                    Remaining Today:{" "}
-                    {user.dailyLimit - user.todayUsage > 0
-                      ? user.dailyLimit - user.todayUsage
-                      : 0}{" "}
-                    MB
-                  </p>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      sx={{ mt: 2 }}
+                      onClick={() => recharge(user._id)}
+                    >
+                      🔄 Recharge Now
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Typography sx={{ mt: 1 }}>
+                      Today Usage: {user.todayUsage} MB
+                    </Typography>
+                    <Typography>Data Bank: {user.dataBank} MB</Typography>
+                    <Typography sx={{ mb: 2 }}>
+                      Remaining Today:{" "}
+                      {user.dailyLimit - user.todayUsage > 0
+                        ? user.dailyLimit - user.todayUsage
+                        : 0}{" "}
+                      MB
+                    </Typography>
 
-                  <input
-                    type="number"
-                    placeholder="Enter Usage (MB)"
-                    value={usageInputs[user._id] || ""}
-                    onChange={(e) =>
-                      setUsageInputs({
-                        ...usageInputs,
-                        [user._id]: e.target.value,
-                      })
-                    }
-                    style={{ padding: "5px", marginRight: "10px" }}
-                  />
+                    <TextField
+                      type="number"
+                      label="Enter Usage (MB)"
+                      variant="outlined"
+                      value={usageInputs[user._id] || ""}
+                      onChange={(e) =>
+                        setUsageInputs({
+                          ...usageInputs,
+                          [user._id]: e.target.value,
+                        })
+                      }
+                      sx={{ width: "200px", mb: 2 }}
+                    />
 
-                  <button
-                    onClick={() => addUsage(user._id)}
-                    style={{ padding: "5px 10px", cursor: "pointer" }}
-                  >
-                    Add Usage
-                  </button>
-                </>
-              )}
-            </div>
+                    <br />
+
+                    <Button
+                      variant="contained"
+                      onClick={() => addUsage(user._id)}
+                    >
+                      Add Usage
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           );
         })
       )}
