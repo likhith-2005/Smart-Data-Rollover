@@ -5,41 +5,55 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+
+  phoneNumber: {
+    type: String,
+    required: true,
+    unique: true
+  },
+
+  // ❌ Not required – user gets plan only after recharge
   planType: {
     type: String,
-    required: true
+    default: "none"
   },
+
   dailyLimit: {
     type: Number,
-    required: true
+    default: 0
   },
+
   validity: {
     type: Number,
-    required: true
+    default: 0
   },
+
   todayUsage: {
     type: Number,
     default: 0
   },
+
   dataBank: {
     type: Number,
     default: 0
   },
+
   rechargeStartDate: {
     type: Date,
-    default: Date.now
+    default: null
   },
+
   lastResetDate: {
     type: Date,
     default: Date.now
   },
 
-  // ✅ FIXED: Added comma above and correct schema below
+  // History
   history: [
     {
       date: { type: Date, default: Date.now },
-      usage: Number,
-      message: String
+      usage: { type: Number, default: 0 },
+      message: { type: String }
     }
   ]
 });

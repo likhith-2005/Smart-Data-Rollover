@@ -1,84 +1,52 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { TextField, Button, MenuItem, Box } from "@mui/material";
 
 function AddUser() {
-  const [user, setUser] = useState({
-    name: "",
-    planType: "",
-    dailyLimit: "",
-    validity: ""
-  });
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
+  const handleAddUser = async () => {
+    console.log("SENDING:", name, phone);
 
-  const createUser = () => {
-    axios.post("http://localhost:5000/api/users", user)
-      .then(() => {
-        alert("User Added Successfully");
-        setUser({ name: "", planType: "", dailyLimit: "", validity: "" });
-      })
-      .catch(err => console.log(err));
+    try {
+      const res = await axios.post("http://localhost:5000/api/users/add", {
+        name: name.trim(),
+        phoneNumber: phone.trim(),   // MUST SEND THIS
+      });
+
+      setMessage("User Added Successfully ✔️");
+      setName("");
+      setPhone("");
+
+    } catch (err) {
+      console.log(err);
+      setMessage(err.response?.data?.message || "Error adding user ❌");
+    }
   };
 
   return (
-    <Box sx={{ maxWidth: 400, margin: "0 auto", padding: 3 }}>
+    <div>
       <h2>Add New User</h2>
 
-      <TextField 
-        fullWidth 
-        label="User Name" 
-        name="name"
-        value={user.name}
-        onChange={handleChange}
-        margin="normal"
+      <input
+        type="text"
+        placeholder="User Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
 
-      <TextField
-        select
-        fullWidth
-        label="Plan Type"
-        name="planType"
-        value={user.planType}
-        onChange={handleChange}
-        margin="normal"
-      >
-        <MenuItem value="1GB/day">1GB/day</MenuItem>
-        <MenuItem value="2GB/day">2GB/day</MenuItem>
-        <MenuItem value="3GB/day">3GB/day</MenuItem>
-      </TextField>
-
-      <TextField
-        fullWidth
-        label="Daily Limit (MB)"
-        name="dailyLimit"
-        type="number"
-        value={user.dailyLimit}
-        onChange={handleChange}
-        margin="normal"
+      <input
+        type="text"
+        placeholder="Phone Number"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
       />
 
-      <TextField
-        fullWidth
-        label="Validity (Days)"
-        name="validity"
-        type="number"
-        value={user.validity}
-        onChange={handleChange}
-        margin="normal"
-      />
+      <button onClick={handleAddUser}>ADD USER</button>
 
-      <Button 
-        variant="contained" 
-        fullWidth 
-        sx={{ marginTop: 2 }}
-        onClick={createUser}
-      >
-        Add User
-      </Button>
-    </Box>
+      {message && <p>{message}</p>}
+    </div>
   );
 }
 
