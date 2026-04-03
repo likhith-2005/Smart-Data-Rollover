@@ -12,12 +12,6 @@ const userSchema = new mongoose.Schema({
     unique: true
   },
 
-  // ❌ Not required – user gets plan only after recharge
-  planType: {
-    type: String,
-    default: "none"
-  },
-
   dailyLimit: {
     type: Number,
     default: 0
@@ -48,12 +42,11 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
 
-  // History
   history: [
     {
       date: { type: Date, default: Date.now },
-      usage: { type: Number, default: 0 },
-      message: { type: String }
+      usage: Number,
+      message: String
     }
   ]
 });
